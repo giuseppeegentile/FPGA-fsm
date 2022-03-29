@@ -1,3 +1,14 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE IEEE.STD_LOGIC_UNSIGNED.ALL;
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+USE IEEE.NUMERIC_STD.ALL;
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
 
 entity project_reti_logiche is
     Port (
@@ -13,17 +24,6 @@ entity project_reti_logiche is
         );
         
 end project_reti_logiche;
-
-architecture Behavioral of project_reti_logiche is 
-	component datapath is
-	Port ( 	i_clk : in STD_LOGIC;
-		i_rst : in STD_LOGIC;
-		i_data : in STD_LOGIC_VECTOR (7 downto 0);
-           	o_data : out STD_LOGIC_VECTOR (7 downto 0); --o 15?
-		rIN_load : in STD_LOGIC;
-                sel : in STD_LOGIC_VECTOR;
-     	        o_done : out STD_LOGIC);
-end component;
 
 entity serial2parallel is
 	Port( 
