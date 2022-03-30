@@ -18,11 +18,6 @@ entity project_reti_logiche is
         
 end project_reti_logiche;
 
-library IEEE;
-USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.NUMERIC_STD.ALL;
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
-
 
 architecture arch of project_reti_logiche is
 type fsm_state is (
@@ -87,6 +82,11 @@ begin
                     o_address <=  "0000001111101000" + counter;
                     o_data <= temp_byte_to_write;
                     cur_state <= READ_BYTE;
+                    
+                    o_we <= '0'; --deve poter continuare a leggere da memoria dopo aver scritto
+                    if (counter = num_bytes) then --se ho finito di leggere 
+                        o_done <= '1';
+                    end if;
                     
                      
                when READ_BYTE =>
