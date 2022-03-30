@@ -94,9 +94,10 @@ begin
                    counter <= counter + "1";
                    temp_byte_to_read <= i_data;
                    cur_state <= READ_S0;
+                   counter_bit <= 0;
                
               when READ_S0 =>
-                  if (counter_bit = 7) then
+                  if (counter_bit = 8) then  --cambiato da 7 a 8
                       cur_state <= SAVE_BYTE;
                   else
                       if (temp_byte_to_read(counter_bit) = '0') then
@@ -115,7 +116,7 @@ begin
                    end if;
     
                when READ_S1 =>
-                   if (counter_bit = 7) then
+                   if (counter_bit = 8) then
                        cur_state <= SAVE_BYTE;
                    else
                        if (temp_byte_to_read(counter_bit) = '0') then
@@ -135,7 +136,7 @@ begin
     
     
                when READ_S2 =>
-                   if (counter_bit = 7) then
+                   if (counter_bit = 8) then
                        cur_state <= SAVE_BYTE;
                    else
                        if (temp_byte_to_read(counter_bit) = '0') then
@@ -155,27 +156,38 @@ begin
                     
                     
                when READ_S3 =>
-                        if (counter_bit = 7) then
-                            cur_state <= SAVE_BYTE;
-                        else
-                            if (temp_byte_to_read(counter_bit) = '0') then
-                                temp_byte_to_write(counter_bit) <= '0';
-                                counter_bit <= counter_bit + 1; 
-                                temp_byte_to_write(counter_bit) <= '1';
-                                counter_bit <= counter_bit + 1; 
-                                cur_state <= READ_S1;
-                            else 
-                                temp_byte_to_write(counter_bit) <= '1';
-                                counter_bit <= counter_bit + 1; 
-                                temp_byte_to_write(counter_bit) <= '0';
-                                counter_bit <= counter_bit + 1; 
-                                cur_state <= READ_S3;
-                             end if;
+                    if (counter_bit = 8) then
+                        cur_state <= SAVE_BYTE;
+                    else
+                        if (temp_byte_to_read(counter_bit) = '0') then
+                            temp_byte_to_write(counter_bit) <= '0';
+                            counter_bit <= counter_bit + 1; 
+                            temp_byte_to_write(counter_bit) <= '1';
+                            counter_bit <= counter_bit + 1; 
+                            cur_state <= READ_S1;
+                        else 
+                            temp_byte_to_write(counter_bit) <= '1';
+                            counter_bit <= counter_bit + 1; 
+                            temp_byte_to_write(counter_bit) <= '0';
+                            counter_bit <= counter_bit + 1; 
+                            cur_state <= READ_S3;
                          end if;
+                     end if;
+                     
+                when DONE =>
+                    o_done<= '1';
+                    if (i_start = '1') then
+                        cur_state <= DONE;
+                    else
+                        cur_state <= READ_NUMBER_BYTE;
+                    end if;
+                    
+                when others =>                     
+                    counter <= "0000000000000001";    --aggiunto caso when  others 
                
-            end case;
+                end case;
+            end if;
         end if;
-    end if;
     end process;
 end architecture;
             
