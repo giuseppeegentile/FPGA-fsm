@@ -9,13 +9,13 @@ create_project -in_memory -part xc7k70tfbv676-1
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
-set_property webtalk.parent_dir C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.cache/wt [current_project]
-set_property parent.project_path C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.xpr [current_project]
+set_property webtalk.parent_dir {C:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.cache/wt} [current_project]
+set_property parent.project_path {C:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.xpr} [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
-set_property ip_output_repo c:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.cache/ip [current_project]
+set_property ip_output_repo {c:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.cache/ip} [current_project]
 set_property ip_cache_permissions {read write} [current_project]
-read_vhdl -library xil_defaultlib C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/fsm.vhd
+read_vhdl -library xil_defaultlib {{C:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/fsm.vhd}}
 foreach dcp [get_files -quiet -all *.dcp] {
   set_property used_in_implementation false $dcp
 }

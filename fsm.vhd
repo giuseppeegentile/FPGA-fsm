@@ -35,10 +35,10 @@ type fsm_state is (
     signal cur_state, next_state: fsm_state;
     signal counter : std_logic_vector(15 downto 0);
     signal num_bytes :  std_logic_vector(7 downto 0);
-    signal current_address : std_logic_vector(7 downto 0); --indirizzo lettura da memoria
+    --signal current_address : std_logic_vector(7 downto 0); --indirizzo lettura da memoria
     signal temp_byte_to_read : std_logic_vector(7 downto 0);
     signal temp_byte_to_write : std_logic_vector(7 downto 0);
-    signal counter_bit : integer  range 0 to 7 := 7;
+    signal counter_bit : integer  range 0 to 8 := 8;
 
 begin
     process(i_clk, i_rst)
@@ -56,7 +56,7 @@ begin
                     o_data <= "00000000";
                     o_done <= '0';
                     cur_state <= RESET;
-                    current_address <= "00000000";
+                    --current_address <= "00000000";
                     o_address <= "0000000000000000";           
                     counter <= "0000000000000000";
                     cur_state <= IDLING;        
@@ -69,7 +69,7 @@ begin
                 
                 when READ_NUMBER_BYTE =>
                     num_bytes <= i_data;
-                    o_address <= "0000000000000001";
+                    o_address <= "0000000000000001"; --serve davvero?
                     if counter < num_bytes then
                         cur_state <= READ_BYTE;
                     else
@@ -82,7 +82,7 @@ begin
                     o_address <=  "0000001111101000" + counter;
                     o_data <= temp_byte_to_write;
                     cur_state <= READ_BYTE;
-                    
+                    --current_address <= current_address + "1";
                     o_we <= '0'; --deve poter continuare a leggere da memoria dopo aver scritto
                     if (counter = num_bytes) then --se ho finito di leggere 
                         o_done <= '1';
