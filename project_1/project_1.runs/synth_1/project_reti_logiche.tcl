@@ -19,6 +19,9 @@ read_vhdl -library xil_defaultlib {{C:/Users/Giuseppe/Documents/.terzo anno/prog
 foreach dcp [get_files -quiet -all *.dcp] {
   set_property used_in_implementation false $dcp
 }
+read_xdc {{C:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/constrs_1/new/constr.xdc}}
+set_property used_in_implementation false [get_files {{C:/Users/Giuseppe/Documents/.terzo anno/progetto RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/constrs_1/new/constr.xdc}}]
+
 
 synth_design -top project_reti_logiche -part xc7k70tfbv676-1
 
