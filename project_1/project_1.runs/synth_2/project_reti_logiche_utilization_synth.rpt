@@ -1,7 +1,7 @@
 Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2016.4 (win64) Build 1756540 Mon Jan 23 19:11:23 MST 2017
-| Date         : Fri Apr 01 11:00:55 2022
+| Date         : Sat Apr 02 17:26:16 2022
 | Host         : DESKTOP-P7L12CR running 64-bit major release  (build 9200)
 | Command      : report_utilization -file project_reti_logiche_utilization_synth.rpt -pb project_reti_logiche_utilization_synth.pb
 | Design       : project_reti_logiche
@@ -152,15 +152,15 @@ Table of Contents
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
 | FDRE     |   74 |        Flop & Latch |
-| LUT6     |   41 |                 LUT |
+| LUT6     |   39 |                 LUT |
 | LUT1     |   33 |                 LUT |
 | OBUF     |   27 |                  IO |
-| LUT4     |   21 |                 LUT |
+| LUT4     |   23 |                 LUT |
+| LUT5     |   13 |                 LUT |
 | CARRY4   |   13 |          CarryLogic |
-| LUT5     |   12 |                 LUT |
 | IBUF     |   11 |                  IO |
 | LUT2     |    8 |                 LUT |
-| LUT3     |    5 |                 LUT |
+| LUT3     |    4 |                 LUT |
 | BUFG     |    1 |               Clock |
 +----------+------+---------------------+
 
