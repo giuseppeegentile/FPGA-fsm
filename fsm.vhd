@@ -6,7 +6,7 @@ USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity project_reti_logiche is
     Port (
         i_clk : in std_logic;
-	    i_rst : in std_logic;
+        i_rst : in std_logic;
         i_start : in std_logic;
         i_data : in std_logic_vector(7 downto 0);
         o_address : out std_logic_vector(15 downto 0);
@@ -32,10 +32,9 @@ type fsm_state is (
         SAVE_BYTE,
         DONE
     );
-    signal cur_state, next_state: fsm_state;
+    signal cur_state: fsm_state;
     signal counter : std_logic_vector(15 downto 0);
     signal num_bytes :  std_logic_vector(7 downto 0);
-    --signal current_address : std_logic_vector(7 downto 0); --indirizzo lettura da memoria
     signal temp_byte_to_read : std_logic_vector(7 downto 0);
     signal temp_byte_to_write : std_logic_vector(7 downto 0);
     signal counter_bit : integer  range 0 to 8 := 8;
@@ -55,8 +54,6 @@ begin
                     o_we <= '0';
                     o_data <= "00000000";
                     o_done <= '0';
-                    --cur_state <= RESET;
-                    --current_address <= "00000000";
                     o_address <= "0000000000000000";           
                     counter <= "0000000000000000";
                     cur_state <= IDLING;        
@@ -68,39 +65,40 @@ begin
                     END IF;       
                 
                 when READ_NUMBER_BYTE =>
+                    o_we <= '0';
+                    o_en <= '1';
+                    o_address <= "0000000000000000";   
                     num_bytes <= i_data;
-                    o_address <= "0000000000000001"; --serve davvero?
-                    if counter < num_bytes then
-                        cur_state <= READ_BYTE;
-                    else
-                        counter <= counter + 1;
-                        o_done <= '1';
-                        cur_state <= DONE;
-                    end if;
+                    counter <= counter + 1;
+                    cur_state <= READ_BYTE;
+
                     
                 when SAVE_BYTE =>
+                    o_address <=  "0000001111101000" + counter;
+                    counter <= counter + 1;
                     o_we <= '1';
-                    o_address <=  "0000000000001000" + counter;
+                    o_en <= '1';
+                    
                     o_data <= temp_byte_to_write;
                     
-                    --current_address <= current_address + "1";
-                    o_we <= '0'; --deve poter continuare a leggere da memoria dopo aver scritto
                     if (counter = num_bytes) then --se ho finito di leggere 
                         o_done <= '1';
                         cur_state <= DONE;
                     end if;
+                    counter_bit <= 0;
                     cur_state <= READ_BYTE;
                     
                      
                when READ_BYTE =>
+                   o_we <= '0'; 
                    o_address <= counter;
-                   counter <= counter + 1;
+
                    temp_byte_to_read <= i_data;
                    counter_bit <= 0;
                    cur_state <= READ_S0;
                
               when READ_S0 =>
-                  if (counter_bit = 8) then  --cambiato da 7 a 8
+                  if (counter_bit = 8) then  
                       cur_state <= SAVE_BYTE;
                   else
                       if (temp_byte_to_read(counter_bit) = '0') then
@@ -178,23 +176,14 @@ begin
                      end if;
                      
                 when DONE =>
-                    
-                    if (i_start = '0') then
-                        o_done<= '0';
-                        o_en <= '0';
-                        cur_state <= RESET;
-                    else
-                        o_done<= '0';
-                        o_we <= '0';
-                    end if;
+                    o_done<= '1';
+                    cur_state <= IDLING;
                     
                 when others =>                     
-                    counter <= "0000000000000001";    --aggiunto caso when  others 
+                    counter <= "0000000000000001";  
                
                 end case;
             end if;
         end if;
     end process;
 end architecture;
-            
-                
