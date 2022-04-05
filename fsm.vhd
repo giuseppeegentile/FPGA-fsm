@@ -33,10 +33,10 @@ ARCHITECTURE arch OF project_reti_logiche IS
     SIGNAL cur_state, suspended_state : fsm_state;
     SIGNAL counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL num_bytes : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL temp_byte_to_read : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL temp_byte_to_write : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL counter_bit_write : INTEGER RANGE 0 TO 8 := 8;
-    SIGNAL counter_bit_read : INTEGER RANGE 0 TO 8 := 8;
+    SIGNAL temp_byte_to_read : STD_LOGIC_VECTOR(0 TO 7);
+    SIGNAL temp_byte_to_write : STD_LOGIC_VECTOR(0 TO 7);
+    SIGNAL counter_bit_write : INTEGER RANGE 0 TO 8;
+    SIGNAL counter_bit_read : INTEGER RANGE 0 TO 8;
 BEGIN
     PROCESS (i_clk, i_rst)
     BEGIN
@@ -54,6 +54,8 @@ BEGIN
                         o_done <= '0';
                         o_address <= "0000000000000000";
                         counter <= "0000000000000000";
+                        counter_bit_read <= 0;
+                        counter_bit_write <= 0;
                         cur_state <= IDLING;
 
                     WHEN IDLING =>
@@ -67,16 +69,20 @@ BEGIN
                         o_en <= '1';
                         o_address <= "0000000000000000";
                         num_bytes <= i_data;
-                        counter <= counter + 1;
+                        counter_bit_read <= 0;
+                        counter_bit_write <= 0;
+                        o_address <= "0000000000000001";
                         cur_state <= READ_BYTE;
+                        
                     WHEN SAVE_BYTE =>
-                        o_address <= "0000001111101000" + counter - 1;
+                        o_address <= "0000001111101000" + counter;
                         o_we <= '1';
                         o_en <= '1';
                         o_data <= temp_byte_to_write;
-                        IF (counter > num_bytes) THEN --se ho finito di leggere 
+                        IF (counter >= num_bytes) THEN --se ho finito di leggere 
                             cur_state <= DONE;
                         ELSE IF (counter_bit_read = 4) THEN
+                            counter <= counter + 1;
                             counter_bit_write <= 0;
                             cur_state <= suspended_state;
                         ELSE IF (counter_bit_read = 8) THEN
@@ -89,11 +95,12 @@ BEGIN
                     WHEN READ_BYTE =>
                         o_we <= '0';
                         IF (counter_bit_read = 8) THEN
+                            counter_bit_read <= 0;
                             o_address <= counter;
                         END IF;
                         temp_byte_to_read <= i_data;
                         counter_bit_write <= 0;
-                        counter_bit_read <= 0;
+                        
                         cur_state <= READ_S0;
 
                     WHEN READ_S0 =>
