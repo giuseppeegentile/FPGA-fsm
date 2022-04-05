@@ -69,51 +69,43 @@ BEGIN
                         o_en <= '1';
                         o_address <= "0000000000000000";
                         num_bytes <= i_data;
+                        num_bytes <= num_bytes(6 DOWNTO 0) & '0';
                         counter_bit_read <= 0;
                         counter_bit_write <= 0;
                         o_address <= "0000000000000001";
                         cur_state <= READ_BYTE;
                         
                     WHEN SAVE_BYTE =>
+                        --caso base: senza if, quando read = 4 devo per forza salvare                    
+                        counter_bit_write <= 0;
                         o_address <= "0000001111101000" + counter;
                         o_we <= '1';
                         o_en <= '1';
                         o_data <= temp_byte_to_write;
-                        IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
-                            cur_state <= DONE;
-                        ELSE IF (counter_bit_read = 4) THEN
-                            counter <= counter + 1;
-                            counter_bit_write <= 0;
-                            temp_byte_to_write <= "00000000";
-                            cur_state <= suspended_state;
-                        ELSE IF (counter_bit_read = 8) THEN
-                            temp_byte_to_write <= "00000000";
-                            counter <= counter + 1;
+                        counter <= counter + 1;
+                        temp_byte_to_write <= "00000000";
+                        --caso in cui devo resettare + leggere da memoria
+                        IF (counter_bit_read = 8) THEN
+                            counter_bit_read <= 0;
                             cur_state <= READ_BYTE;
                         END IF;
-                        END IF;
-                    END IF;
-                    
+                        
+                        IF (counter = num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo
+                            cur_state <= DONE;            
+                        END IF;  
+                        
                     WHEN READ_BYTE =>
                         o_we <= '0';
                         counter_bit_write <= 0;         --dovrò scrivere da capo
-                        IF (counter_bit_read = 8) THEN --se ho letto tutta la cella (scritte due celle)
-                            counter_bit_read <= 0;     --riavvolgo il nastro di lettura della cella
+                        IF (counter /= num_bytes) THEN 
                             o_address <= counter +1;      --leggo la cella successiva
+                            temp_byte_to_read <= i_data;                            
                         END IF;
-                        IF (counter_bit_read = 0) THEN  --qui entro in due scenari: sono entrato nel primo if, è il primo byte da leggere.
-                            temp_byte_to_read <= i_data;
-                            cur_state <= READ_S0;
-                        ELSE ------------------------------------------------------------------------------------------
-                            cur_state <= suspended_state; --altrimenti, riprendo da dove mi ero interrotto
-                        END IF;
+
+                        cur_state <= READ_S0;
                         
-                        --cur_state <= READ_S0;
                     WHEN READ_S0 =>
                             IF (counter_bit_write = 8) THEN
-                                IF (counter_bit_read = 4) THEN
-                                    suspended_state <= READ_S0;
-                                END IF;
                                 cur_state <= SAVE_BYTE;
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
@@ -135,10 +127,7 @@ BEGIN
     
                         WHEN READ_S1 =>
                             IF (counter_bit_write = 8) THEN
-                                IF (counter_bit_read = 4) THEN
-                                    suspended_state <= READ_S1;
-                                END IF;
-                                cur_state <= SAVE_BYTE;
+                                cur_state <= SAVE_BYTE;                               
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '1';
@@ -159,10 +148,7 @@ BEGIN
     
                         WHEN READ_S2 =>
                             IF (counter_bit_write = 8) THEN
-                                IF (counter_bit_read = 4) THEN
-                                    suspended_state <= READ_S2;
-                                END IF;
-                                cur_state <= SAVE_BYTE;
+                                cur_state <= SAVE_BYTE;                             
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '0';
@@ -183,10 +169,7 @@ BEGIN
     
                         WHEN READ_S3 =>
                             IF (counter_bit_write = 8) THEN
-                                IF (counter_bit_read = 4) THEN
-                                    suspended_state <= READ_S3;
-                                END IF;
-                                cur_state <= SAVE_BYTE;
+                                cur_state <= SAVE_BYTE;                               
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '1';
