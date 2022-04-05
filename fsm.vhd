@@ -94,13 +94,14 @@ BEGIN
                     
                     WHEN READ_BYTE =>
                         o_we <= '0';
-                        IF (counter_bit_read = 8) THEN
-                            counter_bit_read <= 0;
-                            o_address <= counter;
+                        IF (counter_bit_read = 8) THEN --se ho letto tutta la cella (scritte due celle)
+                            counter_bit_read <= 0;     --riavvolgo il nastro di lettura della cella
+                            o_address <= counter +1;      --leggo la cella successiva
                         END IF;
-                        temp_byte_to_read <= i_data;
-                        counter_bit_write <= 0;
-                        
+                        IF (counter_bit_read = 0) THEN  --qui entro in due scenari: sono entrato nel primo if, è il primo byte da leggere.
+                            temp_byte_to_read <= i_data;
+                        END IF;
+                        counter_bit_write <= 0;         --dovrò scrivere da capo
                         cur_state <= READ_S0;
 
                     WHEN READ_S0 =>
