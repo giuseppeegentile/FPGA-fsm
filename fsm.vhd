@@ -79,13 +79,15 @@ BEGIN
                         o_we <= '1';
                         o_en <= '1';
                         o_data <= temp_byte_to_write;
-                        IF (counter >= num_bytes) THEN --se ho finito di leggere 
+                        IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
                             cur_state <= DONE;
                         ELSE IF (counter_bit_read = 4) THEN
                             counter <= counter + 1;
                             counter_bit_write <= 0;
+                            temp_byte_to_write <= "00000000";
                             cur_state <= suspended_state;
                         ELSE IF (counter_bit_read = 8) THEN
+                            temp_byte_to_write <= "00000000";
                             counter <= counter + 1;
                             cur_state <= READ_BYTE;
                         END IF;
@@ -94,111 +96,115 @@ BEGIN
                     
                     WHEN READ_BYTE =>
                         o_we <= '0';
+                        counter_bit_write <= 0;         --dovrò scrivere da capo
                         IF (counter_bit_read = 8) THEN --se ho letto tutta la cella (scritte due celle)
                             counter_bit_read <= 0;     --riavvolgo il nastro di lettura della cella
                             o_address <= counter +1;      --leggo la cella successiva
                         END IF;
                         IF (counter_bit_read = 0) THEN  --qui entro in due scenari: sono entrato nel primo if, è il primo byte da leggere.
                             temp_byte_to_read <= i_data;
+                            cur_state <= READ_S0;
+                        ELSE ------------------------------------------------------------------------------------------
+                            cur_state <= suspended_state; --altrimenti, riprendo da dove mi ero interrotto
                         END IF;
-                        counter_bit_write <= 0;         --dovrò scrivere da capo
-                        cur_state <= READ_S0;
-
+                        
+                        --cur_state <= READ_S0;
                     WHEN READ_S0 =>
-                        IF (counter_bit_write = 8) THEN
-                            IF (counter_bit_read = 4) THEN
-                                suspended_state <= READ_S0;
-                            END IF;
-                            cur_state <= SAVE_BYTE;
-                        ELSE
-                            IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S0;
+                            IF (counter_bit_write = 8) THEN
+                                IF (counter_bit_read = 4) THEN
+                                    suspended_state <= READ_S0;
+                                END IF;
+                                cur_state <= SAVE_BYTE;
                             ELSE
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S2;
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S0;
+                                ELSE
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S2;
+                                END IF;
                             END IF;
-                        END IF;
+    
+                        WHEN READ_S1 =>
+                            IF (counter_bit_write = 8) THEN
+                                IF (counter_bit_read = 4) THEN
+                                    suspended_state <= READ_S1;
+                                END IF;
+                                cur_state <= SAVE_BYTE;
+                            ELSE
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S0;
+                                ELSE
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S2;
+                                END IF;
+                            END IF;
+    
+                        WHEN READ_S2 =>
+                            IF (counter_bit_write = 8) THEN
+                                IF (counter_bit_read = 4) THEN
+                                    suspended_state <= READ_S2;
+                                END IF;
+                                cur_state <= SAVE_BYTE;
+                            ELSE
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S1;
+                                ELSE
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S3;
+                                END IF;
+                            END IF;
+    
+                        WHEN READ_S3 =>
+                            IF (counter_bit_write = 8) THEN
+                                IF (counter_bit_read = 4) THEN
+                                    suspended_state <= READ_S3;
+                                END IF;
+                                cur_state <= SAVE_BYTE;
+                            ELSE
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S1;
+                                ELSE
+                                    temp_byte_to_write(counter_bit_write) <= '0';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    temp_byte_to_write(counter_bit_write) <= '1';
+                                    counter_bit_write <= counter_bit_write + 1;
+                                    counter_bit_read <= counter_bit_read + 1;
+                                    cur_state <= READ_S3;
+                                END IF;
+                            END IF;
 
-                    WHEN READ_S1 =>
-                        IF (counter_bit_write = 8) THEN
-                            IF (counter_bit_read = 4) THEN
-                                suspended_state <= READ_S1;
-                            END IF;
-                            cur_state <= SAVE_BYTE;
-                        ELSE
-                            IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S0;
-                            ELSE
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S2;
-                            END IF;
-                        END IF;
-
-                    WHEN READ_S2 =>
-                        IF (counter_bit_write = 8) THEN
-                            IF (counter_bit_read = 4) THEN
-                                suspended_state <= READ_S2;
-                            END IF;
-                            cur_state <= SAVE_BYTE;
-                        ELSE
-                            IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S1;
-                            ELSE
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S3;
-                            END IF;
-                        END IF;
-
-                    WHEN READ_S3 =>
-                        IF (counter_bit_write = 8) THEN
-                            IF (counter_bit_read = 4) THEN
-                                suspended_state <= READ_S3;
-                            END IF;
-                            cur_state <= SAVE_BYTE;
-                        ELSE
-                            IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S1;
-                            ELSE
-                                temp_byte_to_write(counter_bit_write) <= '0';
-                                counter_bit_write <= counter_bit_write + 1;
-                                temp_byte_to_write(counter_bit_write) <= '1';
-                                counter_bit_write <= counter_bit_write + 1;
-                                counter_bit_read <= counter_bit_read + 1;
-                                cur_state <= READ_S3;
-                            END IF;
-                        END IF;
 
                     WHEN DONE =>
                         o_done <= '1';
