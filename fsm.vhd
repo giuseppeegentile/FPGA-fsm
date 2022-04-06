@@ -27,7 +27,6 @@ ARCHITECTURE arch OF project_reti_logiche IS
         READ_S2,
         READ_S0,
         RESET,
-        SAVE_BYTE,
         DONE
     );
     SIGNAL cur_state, suspended_state : fsm_state;
@@ -35,8 +34,8 @@ ARCHITECTURE arch OF project_reti_logiche IS
     SIGNAL num_bytes : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL temp_byte_to_read : STD_LOGIC_VECTOR(0 TO 7);
     SIGNAL temp_byte_to_write : STD_LOGIC_VECTOR(0 TO 7);
-    SIGNAL counter_bit_write : INTEGER RANGE 0 TO 8;
-    SIGNAL counter_bit_read : INTEGER RANGE 0 TO 8;
+    SIGNAL counter_bit_write : INTEGER RANGE 0 TO 8 := 0;
+    SIGNAL counter_bit_read : INTEGER RANGE 0 TO 8 := 0;
 BEGIN
     PROCESS (i_clk, i_rst)
     BEGIN
@@ -69,44 +68,34 @@ BEGIN
                         o_en <= '1';
                         o_address <= "0000000000000000";
                         num_bytes <= i_data;
-                        num_bytes <= num_bytes(6 DOWNTO 0) & '0';
                         counter_bit_read <= 0;
                         counter_bit_write <= 0;
                         o_address <= "0000000000000001";
                         cur_state <= READ_BYTE;
                         
-                    WHEN SAVE_BYTE =>
-                        --caso base: senza if, quando read = 4 devo per forza salvare                    
-                        counter_bit_write <= 0;
-                        o_address <= "0000001111101000" + counter;
-                        o_we <= '1';
-                        o_en <= '1';
-                        o_data <= temp_byte_to_write;
-                        counter <= counter + 1;
-                        temp_byte_to_write <= "00000000";
-                        --caso in cui devo resettare + leggere da memoria
-                        IF (counter_bit_read = 8) THEN
-                            counter_bit_read <= 0;
-                            cur_state <= READ_BYTE;
-                        END IF;
-                        
-                        IF (counter = num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo
-                            cur_state <= DONE;            
-                        END IF;  
-                        
                     WHEN READ_BYTE =>
                         o_we <= '0';
                         counter_bit_write <= 0;         --dovrò scrivere da capo
-                        IF (counter /= num_bytes) THEN 
-                            o_address <= counter +1;      --leggo la cella successiva
-                            temp_byte_to_read <= i_data;                            
-                        END IF;
-
+                        counter_bit_read <= 0;
+                        o_address <= counter + "00000001";      --leggo la cella successiva
+                        temp_byte_to_read <= i_data;
                         cur_state <= READ_S0;
                         
                     WHEN READ_S0 =>
                             IF (counter_bit_write = 8) THEN
-                                cur_state <= SAVE_BYTE;
+                                counter_bit_write <= 0;
+                                o_address <= "0000001111101000" + counter;
+                                o_we <= '1';
+                                o_en <= '1';
+                                o_data <= temp_byte_to_write;
+                                counter <= counter + 1;
+                                temp_byte_to_write <= "00000000";
+                                IF (counter_bit_read = 8) THEN
+                                    cur_state <= READ_BYTE;
+                                END IF;
+                                IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
+                                    cur_state <= DONE;            
+                                END IF;                    
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '0';
@@ -115,19 +104,33 @@ BEGIN
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S0;
-                                ELSE
+                                ELSE 
                                     temp_byte_to_write(counter_bit_write) <= '1';
                                     counter_bit_write <= counter_bit_write + 1;
                                     temp_byte_to_write(counter_bit_write) <= '1';
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S2;
+                               
                                 END IF;
                             END IF;
     
                         WHEN READ_S1 =>
                             IF (counter_bit_write = 8) THEN
-                                cur_state <= SAVE_BYTE;                               
+                                counter_bit_write <= 0;
+                                o_address <= "0000001111101000" + counter;
+                                o_we <= '1';
+                                o_en <= '1';
+                                o_data <= temp_byte_to_write;
+                                counter <= counter + 1;
+                                temp_byte_to_write <= "00000000";
+                                IF (counter_bit_read = 8) THEN
+                                    counter_bit_read <= 0;
+                                    cur_state <= READ_BYTE;
+                                END IF;
+                                IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
+                                    cur_state <= DONE;            
+                                END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '1';
@@ -143,12 +146,26 @@ BEGIN
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S2;
+                                    
                                 END IF;
                             END IF;
     
                         WHEN READ_S2 =>
                             IF (counter_bit_write = 8) THEN
-                                cur_state <= SAVE_BYTE;                             
+                                counter_bit_write <= 0;
+                                o_address <= "0000001111101000" + counter;
+                                o_we <= '1';
+                                o_en <= '1';
+                                o_data <= temp_byte_to_write;
+                                counter <= counter + 1;
+                                temp_byte_to_write <= "00000000";
+                                IF (counter_bit_read = 8) THEN
+                                    counter_bit_read <= 0;
+                                    cur_state <= READ_BYTE;
+                                END IF;
+                                IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
+                                    cur_state <= DONE;            
+                                END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '0';
@@ -157,19 +174,33 @@ BEGIN
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S1;
-                                ELSE
+                                ELSE 
                                     temp_byte_to_write(counter_bit_write) <= '1';
                                     counter_bit_write <= counter_bit_write + 1;
                                     temp_byte_to_write(counter_bit_write) <= '0';
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S3;
+                                    
                                 END IF;
                             END IF;
     
                         WHEN READ_S3 =>
                             IF (counter_bit_write = 8) THEN
-                                cur_state <= SAVE_BYTE;                               
+                                counter_bit_write <= 0;
+                                o_address <= "0000001111101000" + counter;
+                                o_we <= '1';
+                                o_en <= '1';
+                                o_data <= temp_byte_to_write;
+                                counter <= counter + 1;
+                                temp_byte_to_write <= "00000000";
+                                IF (counter_bit_read = 8) THEN
+                                    counter_bit_read <= 0;
+                                    cur_state <= READ_BYTE;
+                                END IF;
+                                IF (counter > num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
+                                    cur_state <= DONE;            
+                                END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
                                     temp_byte_to_write(counter_bit_write) <= '1';
@@ -178,13 +209,14 @@ BEGIN
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S1;
-                                ELSE
+                                ELSE 
                                     temp_byte_to_write(counter_bit_write) <= '0';
                                     counter_bit_write <= counter_bit_write + 1;
                                     temp_byte_to_write(counter_bit_write) <= '1';
                                     counter_bit_write <= counter_bit_write + 1;
                                     counter_bit_read <= counter_bit_read + 1;
                                     cur_state <= READ_S3;
+                                    
                                 END IF;
                             END IF;
 
