@@ -26,10 +26,26 @@ ARCHITECTURE arch OF project_reti_logiche IS
         READ_S1,
         READ_S2,
         READ_S0,
+        WRITEBIT1_S0,
+        WRITEBIT2_S0,
+        WRITEBIT3_S0,
+        WRITEBIT4_S0,
+        WRITEBIT1_S1,
+        WRITEBIT2_S1,
+        WRITEBIT3_S1,
+        WRITEBIT4_S1,
+        WRITEBIT1_S2,
+        WRITEBIT2_S2,
+        WRITEBIT3_S2,
+        WRITEBIT4_S2,
+        WRITEBIT1_S3,
+        WRITEBIT2_S3,
+        WRITEBIT3_S3,
+        WRITEBIT4_S3,
         RESET,
         DONE
     );
-    SIGNAL cur_state, suspended_state : fsm_state;
+    SIGNAL cur_state : fsm_state;
     SIGNAL counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL num_bytes : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL temp_byte_to_read : STD_LOGIC_VECTOR(0 TO 7);
@@ -75,7 +91,7 @@ BEGIN
                         
                     WHEN READ_BYTE =>
                         o_we <= '0';
-                        counter_bit_write <= 0;         --dovrò scrivere da capo
+                        counter_bit_write <= 0;         --dovrï¿½ scrivere da capo
                         counter_bit_read <= 0;
                         o_address <= counter + "00000001";      --leggo la cella successiva
                         temp_byte_to_read <= i_data;
@@ -98,22 +114,33 @@ BEGIN
                                 END IF;                    
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S0;
+                                    cur_state <= WRITEBIT1_S0; 
                                 ELSE 
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S2;
-                               
+                                    cur_state <= WRITEBIT3_S0;
                                 END IF;
                             END IF;
+
+                        WHEN WRITEBIT1_S0 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT2_S0;
+
+                        WHEN WRITEBIT2_S0 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S0;
+
+                        WHEN WRITEBIT3_S0 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT4_S0;
+
+                        WHEN WRITEBIT4_S0 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S2;
     
                         WHEN READ_S1 =>
                             IF (counter_bit_write = 8) THEN
@@ -133,22 +160,34 @@ BEGIN
                                 END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S0;
+                                    cur_state <= WRITEBIT1_S1;
                                 ELSE
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S2;
+                                    cur_state <= WRITEBIT3_S1;
                                     
                                 END IF;
                             END IF;
+
+                        WHEN WRITEBIT1_S1 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT2_S1;
+
+                        WHEN WRITEBIT2_S1 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S0;
+
+                        WHEN WRITEBIT3_S1 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT4_S1;
+
+                        WHEN WRITEBIT4_S1 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S2;
     
                         WHEN READ_S2 =>
                             IF (counter_bit_write = 8) THEN
@@ -168,22 +207,34 @@ BEGIN
                                 END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S1;
+                                    cur_state <= WRITEBIT1_S2;
                                 ELSE 
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S3;
+                                    cur_state <= WRITEBIT3_S2;
                                     
                                 END IF;
                             END IF;
+
+                        WHEN WRITEBIT1_S2 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT2_S2;
+
+                        WHEN WRITEBIT2_S2 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S1;
+
+                        WHEN WRITEBIT3_S2 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT4_S2;
+
+                        WHEN WRITEBIT4_S2 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S3;
     
                         WHEN READ_S3 =>
                             IF (counter_bit_write = 8) THEN
@@ -203,22 +254,34 @@ BEGIN
                                 END IF;                                
                             ELSE
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S1;
+                                    cur_state <= WRITEBIT1_S3;
                                 ELSE 
-                                    temp_byte_to_write(counter_bit_write) <= '0';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    temp_byte_to_write(counter_bit_write) <= '1';
-                                    counter_bit_write <= counter_bit_write + 1;
-                                    counter_bit_read <= counter_bit_read + 1;
-                                    cur_state <= READ_S3;
+                                    cur_state <= WRITEBIT3_S3;
                                     
                                 END IF;
                             END IF;
+
+                        WHEN WRITEBIT1_S3 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT2_S3;
+
+                        WHEN WRITEBIT2_S3 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S1;
+
+                        WHEN WRITEBIT3_S3 =>
+                            temp_byte_to_write(counter_bit_write) <= '0';
+                            counter_bit_write <= counter_bit_write + 1;
+                            cur_state <= WRITEBIT4_S3;
+
+                        WHEN WRITEBIT4_S3 =>
+                            temp_byte_to_write(counter_bit_write) <= '1';
+                            counter_bit_write <= counter_bit_write + 1;
+                            counter_bit_read <= counter_bit_read + 1;
+                            cur_state <= READ_S3;
 
 
                     WHEN DONE =>
