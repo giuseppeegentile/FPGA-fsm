@@ -99,9 +99,13 @@ BEGIN
                         cur_state <= MULTIPLY;
                         
                    WHEN MULTIPLY =>
-                        num_bytes <= num_bytes(7 DOWNTO 0) & '0';
-                        temp_state <= READ_S0;
-                        cur_state <= READ_BYTE; 
+                        if(num_bytes = 0)then
+                            cur_state <= DONE;
+                        else
+                            num_bytes <= num_bytes(7 DOWNTO 0) & '0';
+                            temp_state <= READ_S0;
+                            cur_state <= READ_BYTE;
+                        end if; 
                         
                     WHEN SX =>
                         o_address <= counter_read; 
