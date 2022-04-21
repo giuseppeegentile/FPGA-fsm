@@ -54,7 +54,7 @@ ARCHITECTURE arch OF project_reti_logiche IS
     SIGNAL debug : std_logic;
     SIGNAL counter_read : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL counter_write : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    SIGNAL num_bytes : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL num_bytes : STD_LOGIC_VECTOR(8 DOWNTO 0);
     SIGNAL temp_byte_to_read : STD_LOGIC_VECTOR(0 TO 7);
     SIGNAL temp_byte_to_write : STD_LOGIC_VECTOR(0 TO 7);
     SIGNAL counter_bit_write : INTEGER RANGE 0 TO 8 := 0;
@@ -92,14 +92,14 @@ BEGIN
                         o_en <= '1';
                         o_address <= counter_read;
                         counter_read <= counter_read+1;
-                        num_bytes <= i_data;
+                        num_bytes <= '0' & i_data;
                         counter_bit_read <= 0;
                         counter_bit_write <= 0;
                         o_address <= "0000000000000001";
                         cur_state <= MULTIPLY;
                         
                    WHEN MULTIPLY =>
-                        num_bytes <= num_bytes(6 DOWNTO 0) & '0';
+                        num_bytes <= num_bytes(7 DOWNTO 0) & '0';
                         temp_state <= READ_S0;
                         cur_state <= READ_BYTE; 
                         
