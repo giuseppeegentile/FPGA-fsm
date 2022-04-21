@@ -46,7 +46,8 @@ ARCHITECTURE arch OF project_reti_logiche IS
         RESET,
         DONE
     );
-    SIGNAL cur_state : fsm_state;
+    SIGNAL cur_state,temp_state : fsm_state;
+    SIGNAL debug : std_logic;
     SIGNAL counter_read : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL counter_write : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL num_bytes : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -95,19 +96,20 @@ BEGIN
                         
                    WHEN MULTIPLY =>
                         num_bytes <= num_bytes(6 DOWNTO 0) & '0';
+                        temp_state <= READ_S0;
                         cur_state <= READ_BYTE; 
                         
                     WHEN READ_BYTE =>
                         o_we <= '0';
-                        counter_bit_write <= 0;         --dovr� scrivere da capo
-                        counter_bit_read <= 0;
+
                         o_address <= counter_read;      --leggo la cella successiva
                         counter_read <= counter_read+1;
 
                         temp_byte_to_read <= i_data;
-                        cur_state <= READ_S0;
+                        cur_state <= temp_state;
                         
                     WHEN READ_S0 =>
+                        temp_state <= READ_S0;
                             IF (counter_bit_write = 8) THEN
                                 counter_bit_write <= 0;
                                 o_address <= "0000001111101000" + counter_write;
@@ -117,13 +119,15 @@ BEGIN
                                 counter_write <= counter_write + 1;
                                 temp_byte_to_write <= "00000000";
                                 IF (counter_bit_read = 8) THEN
+                                    counter_bit_read <= 0;
                                     cur_state <= READ_BYTE;
                                 END IF;
                                 IF (counter_write = num_bytes) THEN --se ho finito di leggere. il counter tiene conto di quanto scrivo, non di quanto leggo, quindi x2
                                     cur_state <= DONE;            
                                 END IF;                    
                             ELSE
-                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                debug <= temp_byte_to_read(counter_bit_read);
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN    
                                     cur_state <= WRITEBIT1_S0; 
                                 ELSE 
                                     cur_state <= WRITEBIT3_S0;
@@ -153,6 +157,7 @@ BEGIN
                             cur_state <= READ_S2;
     
                         WHEN READ_S1 =>
+                            temp_state <= READ_S1;
                             IF (counter_bit_write = 8) THEN
                                 counter_bit_write <= 0;
                                 o_address <= "0000001111101000" + counter_write;
@@ -169,7 +174,8 @@ BEGIN
                                     cur_state <= DONE;            
                                 END IF;                                
                             ELSE
-                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                debug <= temp_byte_to_read(counter_bit_read);
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN    
                                     cur_state <= WRITEBIT1_S1;
                                 ELSE
                                     cur_state <= WRITEBIT3_S1;
@@ -200,6 +206,7 @@ BEGIN
                             cur_state <= READ_S2;
     
                         WHEN READ_S2 =>
+                            temp_state <= READ_S2;  
                             IF (counter_bit_write = 8) THEN
                                 counter_bit_write <= 0;
                                 o_address <= "0000001111101000" + counter_write;
@@ -216,7 +223,8 @@ BEGIN
                                     cur_state <= DONE;            
                                 END IF;                                
                             ELSE
-                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                debug <= temp_byte_to_read(counter_bit_read); 
+                                IF (temp_byte_to_read(counter_bit_read) = '0') THEN                               
                                     cur_state <= WRITEBIT1_S2;
                                 ELSE 
                                     cur_state <= WRITEBIT3_S2;
@@ -247,6 +255,7 @@ BEGIN
                             cur_state <= READ_S3;
     
                         WHEN READ_S3 =>
+                            temp_state <= READ_S3;
                             IF (counter_bit_write = 8) THEN
                                 counter_bit_write <= 0;
                                 o_address <= "0000001111101000" + counter_write;
@@ -263,7 +272,9 @@ BEGIN
                                     cur_state <= DONE;            
                                 END IF;                                
                             ELSE
+                                debug <= temp_byte_to_read(counter_bit_read); 
                                 IF (temp_byte_to_read(counter_bit_read) = '0') THEN
+                                
                                     cur_state <= WRITEBIT1_S3;
                                 ELSE 
                                     cur_state <= WRITEBIT3_S3;
