@@ -1,7 +1,7 @@
 Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2016.4 (win64) Build 1756540 Mon Jan 23 19:11:23 MST 2017
-| Date         : Thu Apr 21 13:23:08 2022
+| Date         : Thu Apr 21 18:57:31 2022
 | Host         : DESKTOP-P7L12CR running 64-bit major release  (build 9200)
 | Command      : report_drc -file project_reti_logiche_drc_routed.rpt -pb project_reti_logiche_drc_routed.pb -rpx project_reti_logiche_drc_routed.rpx
 | Design       : project_reti_logiche
