@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.4 (win64) Build 1756540 Mon Jan 23 19:11:23 MST 2017
--- Date        : Thu Apr 21 19:01:01 2022
--- Host        : DESKTOP-P7L12CR running 64-bit major release  (build 9200)
--- Command     : write_vhdl -mode funcsim -nolib -force -file {C:/Users/Giuseppe/Documents/.terzo anno/progetto
---               RL/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.sim/sim_1/synth/func/project_tb_func_synth.vhd}
+-- Date        : Tue May 03 16:22:44 2022
+-- Host        : LAPTOP-9RGC9NP1 running 64-bit major release  (build 9200)
+-- Command     : write_vhdl -mode funcsim -nolib -force -file
+--               C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.sim/sim_1/synth/func/project_tb_func_synth.vhd
 -- Design      : project_reti_logiche
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
