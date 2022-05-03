@@ -1,0 +1,7 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.sim/sim_1/synth/func/project_tb_func_synth.vhd" into library xil_defaultlib
+INFO: [VRFC 10-307] analyzing entity project_reti_logiche
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/RL-generator-2021-2022-main/gen_testbench_no_reset.vhd" into library xil_defaultlib
+INFO: [VRFC 10-307] analyzing entity project_tb
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_tre_reset.vhd" into library xil_defaultlib
+INFO: [VRFC 10-307] analyzing entity project_tb
+WARNING: [VRFC 10-1193] overwriting existing primary unit project_tb [C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_tre_reset.vhd:8]

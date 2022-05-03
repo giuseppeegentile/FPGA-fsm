@@ -1,0 +1,46 @@
+Unable to capture context for thread 13596 in process 1748, can not generate back trace
+Unable to capture context for thread 13228 in process 1748, can not generate back trace
+Unable to capture context for thread 5400 in process 1748, can not generate back trace
+Unable to capture context for thread 11116 in process 1748, can not generate back trace
+Unable to capture context for thread 10024 in process 1748, can not generate back trace
+Unable to capture context for thread 2276 in process 1748, can not generate back trace
+Unable to capture context for thread 9064 in process 1748, can not generate back trace
+Unable to capture context for thread 10372 in process 1748, can not generate back trace
+Unable to capture context for thread 15008 in process 1748, can not generate back trace
+Exception at PC 0x00007FFF1540BB93
+Printing stacktrace...
+
+Unable to capture context for thread 6876 in process 1748, can not generate back trace
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+[0]  [0x00007FFF1540BB93]
+[1]  [0x00007FFF1540BB93]
+[2]  [0x00007FFF1540B4A1]
+[3]  [0x00007FFF1540B459]
+[4]  [0x00007FFF153F19FE]
+[5]  [0x00007FFF153F0ED1]
+[6]  [0x00007FFF153F0D76]
+[7]  [0x00007FFF153979F6]
+[8]  [0x00007FFF15387AFB]
+[9]  [0x00007FFF154AE90A]
+[10]  [0x00007FFF154C9F87]
+[11]  [0x00007FFF154CA05F]
+[12] (BaseThreadInitThunk+0x1d) [0x00007FFFA4F4244D]
+[13] (RtlUserThreadStart+0x28) [0x00007FFFA6B8DF88]
+Done
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C
+Exception at PC 0x00007FFFA44AF85C

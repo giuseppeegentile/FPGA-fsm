@@ -1,0 +1,8 @@
+Vivado Simulator 2016.4
+Time resolution is 1 ps
+Failure: Simulation Ended! TEST PASSATO
+Time: 900 ns  Iteration: 0  Process: /project_tb/test  File: C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_seq_min.vhd
+$finish called at time : 900 ns : File "C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_seq_min.vhd" Line 107
+Failure: Simulation Ended! TEST PASSATO
+Time: 1800 ns  Iteration: 0  Process: /project_tb/test  File: C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_seq_min.vhd
+$finish called at time : 1800 ns : File "C:/Users/david/OneDrive/Documenti/Progetto-Reti-Logiche-2022-Polimi/project_1/project_1.srcs/sim_1/imports/Test Bench Progetto/tb_seq_min.vhd" Line 107
